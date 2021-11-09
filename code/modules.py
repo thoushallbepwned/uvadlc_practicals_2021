@@ -19,6 +19,8 @@ You should fill in code into indicated sections.
 """
 import numpy as np
 
+"testing this stuff bla bla bla"
+
 
 class LinearModule(object):
     """
