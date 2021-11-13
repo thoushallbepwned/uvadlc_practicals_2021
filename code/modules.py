@@ -48,14 +48,28 @@ class LinearModule(object):
         # PUT YOUR CODE HERE  #
         #######################
 
+        #function to generate kaiming intialization
+
         def kaiming(in_features):
             kaiming_init = np.random.dist(0, 2/np.sqrt(in_features), in_features)
 
             return kaiming_init
 
-        bias = np.zeros(out_features)
 
-)
+
+        """ We need to create some variables as dictionaries here:"""
+
+        self.initialize = {'weights' = None, 'bias' = None }
+        self.gradient = {'weight' = None, 'bias' = None}
+
+
+
+        self.initialize['weight'] = kaiming(in_features)
+        self.initialize['bias'] = np.zeros(out_features)
+        self.gradient['weight'] = np.zeros(in_features)
+        self.gradient['bias'] = np.zeros(out_features)
+
+
         #######################
         # END OF YOUR CODE    #
         #######################
