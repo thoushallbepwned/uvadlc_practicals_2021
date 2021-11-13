@@ -48,6 +48,14 @@ class LinearModule(object):
         # PUT YOUR CODE HERE  #
         #######################
 
+        def kaiming(in_features):
+            kaiming_init = np.random.dist(0, 2/np.sqrt(in_features), in_features)
+
+            return kaiming_init
+
+        bias = np.zeros(out_features)
+
+)
         #######################
         # END OF YOUR CODE    #
         #######################
