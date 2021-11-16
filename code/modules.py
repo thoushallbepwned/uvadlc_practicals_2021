@@ -99,6 +99,8 @@ class LinearModule(object):
 
         self.x = x
 
+        x = x @ self.initialize['weights'] + self.initialize['bias']
+
         #######################
         # END OF YOUR CODE    #
         #######################

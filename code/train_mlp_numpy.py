@@ -136,10 +136,20 @@ def train(hidden_dims, lr, batch_size, epochs, seed, data_dir):
     # PUT YOUR CODE HERE  #
     #######################
 
+
+    train = cifar10_loader['train']
+
+
     # TODO: Initialize model and loss module
-    model = MLP()
+    model = MLP(32*32*3, hidden_dims, 10)
     loss_module = CrossEntropyModule()
     # TODO: Training loop including validation
+
+    for iteration in range(epochs):
+
+
+
+
 
     y = model.forward(x)
     loss = CrossEntropyModule.forward(x, t)
