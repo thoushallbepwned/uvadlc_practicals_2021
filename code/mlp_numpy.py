@@ -52,7 +52,25 @@ class MLP(object):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-        pass
+        self.modules = []
+        self.n_inputs = n_inputs
+        self.n_hidden = n_hidden
+        self.n_classes = n_classes
+
+
+        prev_layer = n_inputs
+
+        for layer in n_hidden:
+            self.modules.append(LinearModule(prev_layer, layer))
+            self.modules.append(ReLUModule())
+            prev_size = layer
+
+
+        "Then we start writing the output layers"
+        output_layer = LinearModule(prev_layer, n_classes)
+        output_activation = SoftMaxModule()
+        self.modules.append(output_layer, output_activation)
+
         #######################
         # END OF YOUR CODE    #
         #######################
@@ -75,6 +93,10 @@ class MLP(object):
         # PUT YOUR CODE HERE  #
         #######################
 
+        for item in self.modules:
+
+            out = item.forward(out)
+
         #######################
         # END OF YOUR CODE    #
         #######################
@@ -95,7 +117,11 @@ class MLP(object):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-        pass
+        error = dout
+
+        for item in reversed(self.modules):
+            error = item.backward(error)
+        return error
         #######################
         # END OF YOUR CODE    #
         #######################
