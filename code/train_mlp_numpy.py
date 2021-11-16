@@ -53,7 +53,9 @@ def accuracy(predictions, targets):
     #######################
     # PUT YOUR CODE HERE  #
     #######################
-
+    pred_label = np.argmax(predictions, axis=1)
+    ground_truth = np.argmax(targets)
+    accuracy = np.sum(pred_label - ground_truth).mean()
     #######################
     # END OF YOUR CODE    #
     #######################
