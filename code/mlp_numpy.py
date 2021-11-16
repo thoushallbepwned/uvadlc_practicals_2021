@@ -64,7 +64,7 @@ class MLP(object):
 
         Args:
           x: input to the network
-        Returns:
+        Returns:=
           out: outputs of the network
 
         TODO:
