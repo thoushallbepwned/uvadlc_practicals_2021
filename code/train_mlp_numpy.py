@@ -131,13 +131,20 @@ def train(hidden_dims, lr, batch_size, epochs, seed, data_dir):
     cifar10 = cifar10_utils.get_cifar10(data_dir)
     cifar10_loader = cifar10_utils.get_dataloader(cifar10, batch_size=batch_size,
                                                   return_numpy=True)
+    print("this is cifar10_loader", cifar10_loader['test'])
 
     #######################
     # PUT YOUR CODE HERE  #
     #######################
 
 
-    train = cifar10_loader['train']
+    trainset = cifar10_loader['train']
+    testset = cifar10_loader['test']
+    #validset = cifar10_loader['valid']
+
+    best_loss = 1e6
+    train_losses = []
+    valid_losses = []
 
 
     # TODO: Initialize model and loss module
@@ -145,14 +152,23 @@ def train(hidden_dims, lr, batch_size, epochs, seed, data_dir):
     loss_module = CrossEntropyModule()
     # TODO: Training loop including validation
 
-    for iteration in range(epochs):
+    for iteration in range(0, epochs):
+        for data in trainset:
 
 
+            "forward pass"
+            images, labels = trainset
+            y_hat, x = model.forward(images)
+            loss = loss_module(y_hat, labels)
+            running_loss = loss.item() * images.size(0)
+
+            "backward pass"
+            loss.backward()
+
+        epoch_loss = running_loss/len(trainset)
 
 
-
-    y = model.forward(x)
-    loss = CrossEntropyModule.forward(x, t)
+    for
 
     val_accuracies = ...
     # TODO: Test best model

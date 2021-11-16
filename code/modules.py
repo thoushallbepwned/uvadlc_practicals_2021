@@ -51,7 +51,7 @@ class LinearModule(object):
         #function to generate kaiming intialization
 
         def kaiming(in_features):
-            kaiming_init = np.random.dist(0, 2/np.sqrt(in_features), in_features)
+            kaiming_init = np.random.randn(0, 2/np.sqrt(in_features), in_features)
 
             return kaiming_init
 
