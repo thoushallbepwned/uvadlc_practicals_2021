@@ -137,9 +137,13 @@ def train(hidden_dims, lr, batch_size, epochs, seed, data_dir):
     #######################
 
     # TODO: Initialize model and loss module
-    model = ...
-    loss_module = ...
+    model = MLP()
+    loss_module = CrossEntropyModule()
     # TODO: Training loop including validation
+
+    y = model.forward(x)
+    loss = CrossEntropyModule.forward(x, t)
+
     val_accuracies = ...
     # TODO: Test best model
     test_accuracy = ...

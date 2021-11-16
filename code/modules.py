@@ -244,11 +244,11 @@ class SoftMaxModule(object):
         # PUT YOUR CODE HERE  #
         #######################
 
-        shift = x.max(axis = 1, keepdims =True)
+        shift = x.max(axis= 1, keepdims =True)
         y = np.exp(x - shift)
-        out  = y/y.sum(axis =1, keepdims =True)
+        out = y/y.sum(axis=1, keepdims =True)
 
-        self.softmax = out
+        self.softmax= out
 
         #######################
         # END OF YOUR CODE    #
@@ -271,7 +271,7 @@ class SoftMaxModule(object):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-        dx = self.softmax * (dout - (dout * self.softmax)@ np.ones_like(self.softmax))
+        dx = self.softmax * (dout - (dout * self.softmax) @ np.ones_like(self.softmax))
 
         #######################
         # END OF YOUR CODE    #
