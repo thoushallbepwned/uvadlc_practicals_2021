@@ -131,44 +131,49 @@ def train(hidden_dims, lr, batch_size, epochs, seed, data_dir):
     cifar10 = cifar10_utils.get_cifar10(data_dir)
     cifar10_loader = cifar10_utils.get_dataloader(cifar10, batch_size=batch_size,
                                                   return_numpy=True)
-    print("this is cifar10_loader", cifar10_loader['test'])
 
     #######################
     # PUT YOUR CODE HERE  #
     #######################
 
 
-    trainset = cifar10_loader['train']
-    testset = cifar10_loader['test']
-    #validset = cifar10_loader['valid']
-
-    best_loss = 1e6
-    train_losses = []
-    valid_losses = []
-
+    trainset = cifar10['train']
+    testset = cifar10['test']
+    validset = cifar10['validation']
+    running_loss = 0
+    loss = 0
 
     # TODO: Initialize model and loss module
     model = MLP(32*32*3, hidden_dims, 10)
     loss_module = CrossEntropyModule()
     # TODO: Training loop including validation
+    gradient = LinearModule.params["weights"]
+    for epoch in range (0, epochs):
+        for data in traindata:
 
-    for iteration in range(0, epochs):
-        for data in trainset:
-
+            images, labels = data
+            flat_image= np.reshape(images, (len(images), 32*32*3))
 
             "forward pass"
-            images, labels = trainset
-            y_hat, x = model.forward(images)
-            loss = loss_module(y_hat, labels)
-            running_loss = loss.item() * images.size(0)
+            y_hat, _ = model.forward(flat_image)
+            loss = loss_module.forward(y_hat, labels)
+            running_loss += loss.item()*flat_image.size(0)
 
             "backward pass"
-            loss.backward()
+            loss_module.backward(y_hat, labels)
 
-        epoch_loss = running_loss/len(trainset)
+            for module in model.modules:
+                if hasattr(gradient):
+                    gradient -= lr* LinearModule.grads['weights']
 
 
-    for
+        epoch_loss = running_loss/ len(trainset)
+
+
+
+
+
+
 
     val_accuracies = ...
     # TODO: Test best model

@@ -50,22 +50,28 @@ class LinearModule(object):
 
         #function to generate kaiming intialization
 
-        def kaiming(in_features):
-            kaiming_init = np.random.randn(0, 2/np.sqrt(in_features), in_features)
-
-            return kaiming_init
+        # def kaiming(in_features):
+        #     kaiming_init = np.random.randn(0, np.sqrt(1/in_features), (out_features, in_features))
+        #
+        #     return kaiming_init
 
 
 
         """ We need to create some variables as dictionaries here:"""
 
-        self.initialize = {'weights': None, 'bias': None}
-        self.gradient = {'weight': None, 'bias': None}
+        self.params = {'weight' : None,
+                           'bias': np.zeros((1, out_features))}
+        self.grads = {'weight': np.zeros((out_features, in_features)),
+                         'bias': np.zeros((1, out_features))
+                         }
 
-        self.initialize['weight'] = kaiming(in_features)
-        self.initialize['bias'] = np.zeros(out_features)
-        self.gradient['weight'] = np.zeros(in_features)
-        self.gradient['bias'] = np.zeros(out_features)
+
+
+
+        if input_layer:
+            self.params['weight'] = np.random.normal(0, np.sqrt(1/in_features), (out_features, in_features))
+        else:
+            self.params['weight'] = np.random.normal(0, np.sqrt(2/in_features), (out_features, in_features))
 
         self.dW = None
         self.A_prev = None
@@ -94,13 +100,9 @@ class LinearModule(object):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-
-        out = x @ self.initialize['weights'] + self.gradient['bias']
-
+        #out = x @ self.initialize['weights'] + self.gradient['bias']
         self.x = x
-
-        x = x @ self.initialize['weights'] + self.initialize['bias']
-
+        out = x @ self.params['weight'].T + self.params['bias']
         #######################
         # END OF YOUR CODE    #
         #######################
@@ -124,11 +126,11 @@ class LinearModule(object):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-        self.gradient['weights'] = dout.T @ self.x
+        self.grads['weight'] = dout.T @ self.x
 
-        self.gradient['bias'] = np.sum(dout, axis = 0)
-
-        dx = dout @ self.initialize['weights'].T
+        #self.gradient['bias'] = np.sum(dout, axis= 0)
+        self.grads['bias'] = np.ones((1, self.x.shape[0])) @ dout
+        dx = dout @ self.params['weight']
         #######################
         # END OF YOUR CODE    #
         #######################
@@ -145,7 +147,7 @@ class LinearModule(object):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-        pass
+        self.x = None
         #######################
         # END OF YOUR CODE    #
         #######################
@@ -175,7 +177,7 @@ class ReLUModule(object):
         # PUT YOUR CODE HERE  #
         #######################
         out = np.maximum(x, 0)
-
+        self.x = x
         self.ReLU = (x > 0)
         #######################
         # END OF YOUR CODE    #
@@ -216,7 +218,7 @@ class ReLUModule(object):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-        pass
+        self.x
         #######################
         # END OF YOUR CODE    #
         #######################
@@ -250,7 +252,7 @@ class SoftMaxModule(object):
         y = np.exp(x - shift)
         out = y/y.sum(axis=1, keepdims =True)
 
-        self.softmax= out
+        self.out= out
 
         #######################
         # END OF YOUR CODE    #
@@ -273,7 +275,9 @@ class SoftMaxModule(object):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-        dx = self.softmax * (dout - (dout * self.softmax) @ np.ones_like(self.softmax))
+
+        ones_df = np.ones((self.out.shape[1], self.out.shape[1]))
+        dx = self.out * (dout - (dout * self.out) @ ones_df)
 
         #######################
         # END OF YOUR CODE    #
@@ -292,7 +296,7 @@ class SoftMaxModule(object):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-        pass
+        self.out= None
         #######################
         # END OF YOUR CODE    #
         #######################
@@ -319,8 +323,11 @@ class CrossEntropyModule(object):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-        all_out = -np.sum(y*np.log(x), axis= 1)
-        out = np.mean(all_out)
+        one_hot = np.zeros_like((x))
+        one_hot[np.arange((len(y))), y] = 1
+        #print(one_hot)
+        out = -np.sum(one_hot*np.log(x))*1/x.shape[0]
+        #out = np.mean(all_out)
         #######################
         # END OF YOUR CODE    #
         #######################
@@ -343,8 +350,9 @@ class CrossEntropyModule(object):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-
-        dx = (-y/x)/len(x)
+        one_hot = np.zeros_like((x))
+        one_hot[np.arange((len(y))), y] = 1
+        dx = (np.divide(one_hot,x)* -1/x.shape[0])
 
         #######################
         # END OF YOUR CODE    #

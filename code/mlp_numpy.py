@@ -69,7 +69,8 @@ class MLP(object):
         "Then we start writing the output layers"
         output_layer = LinearModule(prev_layer, n_classes)
         output_activation = SoftMaxModule()
-        self.modules.append(output_layer, output_activation)
+        self.modules.append(output_layer)
+        self.modules.append(output_activation)
 
         #######################
         # END OF YOUR CODE    #
@@ -138,7 +139,7 @@ class MLP(object):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-        pass
+        self.x = None
         #######################
         # END OF YOUR CODE    #
         #######################
