@@ -58,19 +58,18 @@ class MLP(object):
         self.n_classes = n_classes
 
 
+        options = [n_inputs] + n_hidden + [n_classes]
+
+
         prev_layer = n_inputs
+        for layer in range(len(options)-1):
+            input, output = options[layer], options[layer + 1]
+            self.modules.append(LinearModule(input, output))
 
-        for layer in n_hidden:
-            self.modules.append(LinearModule(prev_layer, layer))
-            self.modules.append(ReLUModule())
-            prev_size = layer
-
-
-        "Then we start writing the output layers"
-        output_layer = LinearModule(prev_layer, n_classes)
-        output_activation = SoftMaxModule()
-        self.modules.append(output_layer)
-        self.modules.append(output_activation)
+            if layer < len(options) - 2:
+                self.modules.append(ReLUModule())
+            else:
+                self.modules.append(SoftMaxModule())
 
         #######################
         # END OF YOUR CODE    #
@@ -93,10 +92,10 @@ class MLP(object):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
+        out = x
+        for module in self.modules:
 
-        for item in self.modules:
-
-            out = item.forward(out)
+            out = module.forward(out)
 
         #######################
         # END OF YOUR CODE    #

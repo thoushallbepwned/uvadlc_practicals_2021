@@ -84,7 +84,20 @@ def evaluate_model(model, data_loader):
     # PUT YOUR CODE HERE  #
     #######################
 
-    #######################
+    score = []
+
+    for data in data_loader:
+        test_images, test_labels = data_loader['test'].next_batch(data)
+        flat_test_image = np.reshape(images, (len(images), 32 * 32 * 3))
+
+        y_hat, _ = model.forward(flat_test_image)
+        score.append(accuracy(y_hat, test_labels))
+
+        print(score)
+
+        avg_accuracy = np.mean(score)
+
+     #######################
     # END OF YOUR CODE    #
     #######################
 
@@ -142,42 +155,52 @@ def train(hidden_dims, lr, batch_size, epochs, seed, data_dir):
     validset = cifar10['validation']
     running_loss = 0
     loss = 0
+    batch_vector = []
 
     # TODO: Initialize model and loss module
     model = MLP(32*32*3, hidden_dims, 10)
     loss_module = CrossEntropyModule()
     # TODO: Training loop including validation
-    gradient = LinearModule.params["weights"]
-    for epoch in range (0, epochs):
-        for data in traindata:
+    for epoch in range(0, epochs):
+        for data in trainset:
 
             images, labels = data
-            flat_image= np.reshape(images, (len(images), 32*32*3))
-
+        #print(images)
+            flat_image= images.reshape(batch_size, -1)
+            print("finished")
+            #
             "forward pass"
             y_hat, _ = model.forward(flat_image)
             loss = loss_module.forward(y_hat, labels)
-            running_loss += loss.item()*flat_image.size(0)
+            accuracy(y_hat, labels)
+
 
             "backward pass"
-            loss_module.backward(y_hat, labels)
+
+            model.backward(loss_module.backward(y_hat, labels))
 
             for module in model.modules:
-                if hasattr(gradient):
-                    gradient -= lr* LinearModule.grads['weights']
+                print(module)
+                if hasattr(module, 'params'):
+                    module.params['weight'] -= lr* module.grads['weights']
+                    module.params['bias'] -= lr*module.grads['bias']
+
+            train_loss = CrossEntropyModule.forward(y_hat, labels)
+            train_accuracy = accuracy(y_hat, labels)
+
+            print(f"Train loss in {epoch} is : {train_loss}")
+            print(f"Train accuracy at {epoch} is: {train_accuracy}")
 
 
-        epoch_loss = running_loss/ len(trainset)
 
 
 
 
 
 
-
-    val_accuracies = ...
+    val_accuracies = evaluate_model(model, validset)
     # TODO: Test best model
-    test_accuracy = ...
+    #test_accuracy = accuracy
     # TODO: Add any information you might want to save for plotting
     logging_info = ...
     #######################

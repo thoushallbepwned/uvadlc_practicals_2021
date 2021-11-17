@@ -59,8 +59,7 @@ class LinearModule(object):
 
         """ We need to create some variables as dictionaries here:"""
 
-        self.params = {'weight' : None,
-                           'bias': np.zeros((1, out_features))}
+        self.params = {'bias': np.zeros((1, out_features))}
         self.grads = {'weight': np.zeros((out_features, in_features)),
                          'bias': np.zeros((1, out_features))
                          }
@@ -73,11 +72,6 @@ class LinearModule(object):
         else:
             self.params['weight'] = np.random.normal(0, np.sqrt(2/in_features), (out_features, in_features))
 
-        self.dW = None
-        self.A_prev = None
-        self.ZL = None
-
-        self.activation = None
         #######################
         # END OF YOUR CODE    #
         #######################
@@ -249,8 +243,8 @@ class SoftMaxModule(object):
         #######################
 
         shift = x.max(axis= 1, keepdims =True)
-        y = np.exp(x - shift)
-        out = y/y.sum(axis=1, keepdims =True)
+
+        out = np.exp(x-shift)/np.sum(np.exp(x-shift), axis=1 , keepdims=True)
 
         self.out= out
 
