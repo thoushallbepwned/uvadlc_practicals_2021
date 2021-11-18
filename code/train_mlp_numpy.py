@@ -54,10 +54,19 @@ def accuracy(predictions, targets):
     #######################
     # PUT YOUR CODE HERE  #
     #######################
-    pred_label = np.argmax(predictions, axis=1)
-    ground_truth = targets
-    accuracy = np.sum(np.equal(pred_label, targets)).mean()
-    #print("accuracy is:", accuracy)
+
+    predictions_indices = predictions.argmax(1)
+
+
+    accuracy = (predictions_indices == targets).sum() / \
+               predictions_indices.shape[0]
+    #pred_label = np.argmax(predictions, axis=1)
+    #print(targets)
+    #ground_truth = np.argmax(targets)
+
+    #print(pred_label,ground_truth)
+
+    #accuracy = np.sum(np.equal(pred_label, targets)).mean()
     #######################
     # END OF YOUR CODE    #
     #######################
@@ -182,6 +191,7 @@ def train(hidden_dims, lr, batch_size, epochs, seed, data_dir):
             model.backward(loss_module.backward(y_hat, labels))
             train_loss = CrossEntropyModule.forward(flat_image, y_hat, labels)
             train_accuracy = accuracy(y_hat, labels)
+
             #print(train_loss)
 
 
@@ -202,15 +212,14 @@ def train(hidden_dims, lr, batch_size, epochs, seed, data_dir):
         graph_loss.append((running_loss))
         graph_acc.append((epoch_accuracy))
         score = evaluate_model(model, validset)
-
         val_accuracies.append(score)
     fig, (ax1, ax2, ax3) = plt.subplots(3)
 
     ax1.plot(graph_loss, 'g', label = "training_loss")
     ax2.plot(graph_acc, 'b', label = "accuracy")
     ax3.plot(val_accuracies, 'r', label = "validation")
-    ax2.set_title("Veli's handsomeness over time")
-    ax1.set_title("Jenn's existential luck over time")
+    ax2.set_title("train_accuracy")
+    ax1.set_title("Loss_train")
     ax3.set_title("Validation accuracy")
     #plt.plot(graph_loss[1], graph_acc[0], graph_loss[0])
     plt.show()
@@ -219,14 +228,15 @@ def train(hidden_dims, lr, batch_size, epochs, seed, data_dir):
 
     #val_accuracies = evaluate_model(model, validset)
     # TODO: Test best model
-    test_accuracy = 0
+    #test_accuracy = 0
     # TODO: Add any information you might want to save for plotting
     logging_dict = 0
+    test_accuracy = evaluate_model(model, testset)
     logging_info = []
     #######################
     # END OF YOUR CODE    #
     #######################
-    print(val_accuracies)
+    print(test_accuracy)
     return model, val_accuracies, test_accuracy, logging_dict
 
 
