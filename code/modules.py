@@ -96,7 +96,9 @@ class LinearModule(object):
         #######################
         #out = x @ self.initialize['weights'] + self.gradient['bias']
         self.x = x
-        out = x @ self.params['weight'].T + self.params['bias']
+
+        print(np.array(x).shape, self.params['weight'].T.shape, self.params['bias'].shape)
+        out = np.array(x) @ self.params['weight'].T + self.params['bias']
         #######################
         # END OF YOUR CODE    #
         #######################
