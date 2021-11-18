@@ -55,7 +55,8 @@ def accuracy(predictions, targets):
     #######################
     # PUT YOUR CODE HERE  #
     #######################
-
+    pred_labels = predictions.argmax(1)
+    accuracy = np.sum(pred_labels == targets) / pred_labels.shape[0]
     #######################
     # END OF YOUR CODE    #
     #######################
@@ -83,7 +84,18 @@ def evaluate_model(model, data_loader):
     #######################
     # PUT YOUR CODE HERE  #
     #######################
+    score = []
 
+    for data in data_loader:
+        test_images, test_labels = data
+        test_images_flat = test_images.reshape(test_labels.shape[0], 32 * 32 * 3)
+
+        y_hat = model.forward(test_images_flat)
+        score.append(accuracy(y_hat, test_labels))
+
+        # print(score)
+
+        avg_accuracy = np.mean(score)
     #######################
     # END OF YOUR CODE    #
     #######################
@@ -146,9 +158,44 @@ def train(hidden_dims, lr, use_batch_norm, batch_size, epochs, seed, data_dir):
     #######################
 
     # TODO: Initialize model and loss module
-    model = ...
-    loss_module = ...
+    model = MLP(32*32*3, hidden_dims, 10)
+    #model.train()
+    loss_module = nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(model.parameters(), lr=lr)
     # TODO: Training loop including validation
+    train_losses = []
+    valid_losses = []
+    best_loss = 1e10
+
+    for epoch in epochs:
+        correct = 0
+        total = 0
+        running_loss = 0
+        train_accu = 0
+        for i, data in enumerate(cifar10_loader['train']):
+            images, labels = data[0], data[1]
+            optimizer.zero_grad()
+
+            outputs = model(images)
+            loss = loss_module(outputs, labels)
+            loss.backwards()
+            optimizer.step()
+
+            running_loss += loss.item()
+            _, predicted = output.max(1)
+            total += labels.size(0)
+            correct += predicted.eq(labels).sum().item()
+
+            train_loss = running_loss/len(cifar10_loader['train'])
+            train_accu.append(accu)
+
+
+        train_accuracy = accuracy(outputs, labels)
+
+        loss_module.backward()
+        optimizer.step()
+        train_losses.append(loss)
+        print(train_losses)
     # TODO: Do optimization with the simple SGD optimizer
     val_accuracies = ...
     # TODO: Test best model

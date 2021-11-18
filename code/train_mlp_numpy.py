@@ -55,18 +55,9 @@ def accuracy(predictions, targets):
     # PUT YOUR CODE HERE  #
     #######################
 
-    predictions_indices = predictions.argmax(1)
+    pred_labels = predictions.argmax(1)
 
-
-    accuracy = (predictions_indices == targets).sum() / \
-               predictions_indices.shape[0]
-    #pred_label = np.argmax(predictions, axis=1)
-    #print(targets)
-    #ground_truth = np.argmax(targets)
-
-    #print(pred_label,ground_truth)
-
-    #accuracy = np.sum(np.equal(pred_label, targets)).mean()
+    accuracy = np.sum(pred_labels == targets)/pred_labels.shape[0]
     #######################
     # END OF YOUR CODE    #
     #######################

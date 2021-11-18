@@ -59,7 +59,14 @@ class MLP(nn.Module):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-        pass
+        self.classifier = nn.Sequential(
+            nn.Linear(n_inputs, n_hidden),
+            nn.ReLU(inplace= True),
+            nn.Linear(n_hidden, n_classes)
+        )
+
+
+
         #######################
         # END OF YOUR CODE    #
         #######################
@@ -81,6 +88,8 @@ class MLP(nn.Module):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
+        x.torch.flatten(x, 1)
+        out = self.classifier(x)
 
         #######################
         # END OF YOUR CODE    #
