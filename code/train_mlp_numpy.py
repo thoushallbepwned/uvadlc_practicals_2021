@@ -29,6 +29,7 @@ from copy import deepcopy
 from mlp_numpy import MLP
 from modules import CrossEntropyModule
 import cifar10_utils
+import matplotlib.pyplot as plt
 
 import torch
 
@@ -54,8 +55,9 @@ def accuracy(predictions, targets):
     # PUT YOUR CODE HERE  #
     #######################
     pred_label = np.argmax(predictions, axis=1)
-    ground_truth = np.argmax(targets)
-    accuracy = np.sum(pred_label - ground_truth).mean()
+    ground_truth = targets
+    accuracy = np.sum(np.equal(pred_label, targets)).mean()
+    #print("accuracy is:", accuracy)
     #######################
     # END OF YOUR CODE    #
     #######################
@@ -87,13 +89,13 @@ def evaluate_model(model, data_loader):
     score = []
 
     for data in data_loader:
-        test_images, test_labels = data_loader['test'].next_batch(data)
-        flat_test_image = np.reshape(images, (len(images), 32 * 32 * 3))
+        test_images, test_labels = data
+        test_images_flat = test_images.reshape(test_labels.shape[0], 32*32*3)
 
-        y_hat, _ = model.forward(flat_test_image)
+        y_hat= model.forward(test_images_flat)
         score.append(accuracy(y_hat, test_labels))
 
-        print(score)
+        #print(score)
 
         avg_accuracy = np.mean(score)
 
@@ -150,68 +152,86 @@ def train(hidden_dims, lr, batch_size, epochs, seed, data_dir):
     #######################
 
 
-    trainset = cifar10['train']
-    testset = cifar10['test']
-    validset = cifar10['validation']
+    trainset = cifar10_loader['train']
+    testset = cifar10_loader['test']
+    validset = cifar10_loader['validation']
     running_loss = 0
+    graph_loss = []
+    graph_acc = []
+    epoch_accuracy = []
     loss = 0
     batch_vector = []
+    val_accuracies = []
 
     # TODO: Initialize model and loss module
     model = MLP(32*32*3, hidden_dims, 10)
     loss_module = CrossEntropyModule()
     # TODO: Training loop including validation
     for epoch in range(0, epochs):
-        for data in trainset:
+        epoch_loss = []
+        avg_accuracy2 = []
+        for images, labels in trainset:
+            flat_image= images.reshape((batch_size, 32*32*3))
+            #print("finished")
 
-            images, labels = data
-        #print(images)
-            flat_image= images.reshape(batch_size, -1)
-            print("finished")
-            #
             "forward pass"
-            y_hat, _ = model.forward(flat_image)
+            y_hat= model.forward(flat_image)
             loss = loss_module.forward(y_hat, labels)
-            accuracy(y_hat, labels)
-
 
             "backward pass"
-
             model.backward(loss_module.backward(y_hat, labels))
+            train_loss = CrossEntropyModule.forward(flat_image, y_hat, labels)
+            train_accuracy = accuracy(y_hat, labels)
+            #print(train_loss)
+
 
             for module in model.modules:
-                print(module)
+                #print(module)
                 if hasattr(module, 'params'):
-                    module.params['weight'] -= lr* module.grads['weights']
+                    module.params['weight'] -= lr* module.grads['weight']
                     module.params['bias'] -= lr*module.grads['bias']
 
-            train_loss = CrossEntropyModule.forward(y_hat, labels)
-            train_accuracy = accuracy(y_hat, labels)
+            epoch_loss.append(train_loss)
+            avg_accuracy2.append(train_accuracy)
 
-            print(f"Train loss in {epoch} is : {train_loss}")
-            print(f"Train accuracy at {epoch} is: {train_accuracy}")
+        running_loss = np.mean(epoch_loss)
+        epoch_accuracy = np.mean(avg_accuracy2)
+        print("length of running loss", len(epoch_loss), "length of epoch", len(avg_accuracy2))
+        print(f"Epoch loss in {epoch} is : {running_loss}")
+        print(f"Epoch accuracy at {epoch} is: {epoch_accuracy}")
+        graph_loss.append((running_loss))
+        graph_acc.append((epoch_accuracy))
+        score = evaluate_model(model, validset)
+
+        val_accuracies.append(score)
+    fig, (ax1, ax2, ax3) = plt.subplots(3)
+
+    ax1.plot(graph_loss, 'g', label = "training_loss")
+    ax2.plot(graph_acc, 'b', label = "accuracy")
+    ax3.plot(val_accuracies, 'r', label = "validation")
+    ax2.set_title("Veli's handsomeness over time")
+    ax1.set_title("Jenn's existential luck over time")
+    ax3.set_title("Validation accuracy")
+    #plt.plot(graph_loss[1], graph_acc[0], graph_loss[0])
+    plt.show()
 
 
 
-
-
-
-
-
-    val_accuracies = evaluate_model(model, validset)
+    #val_accuracies = evaluate_model(model, validset)
     # TODO: Test best model
-    #test_accuracy = accuracy
+    test_accuracy = 0
     # TODO: Add any information you might want to save for plotting
-    logging_info = ...
+    logging_dict = 0
+    logging_info = []
     #######################
     # END OF YOUR CODE    #
     #######################
-
+    print(val_accuracies)
     return model, val_accuracies, test_accuracy, logging_dict
 
 
 if __name__ == '__main__':
-    # Command line arguments
+    # Command line arguments\]
     parser = argparse.ArgumentParser()
     
     # Model hyperparameters

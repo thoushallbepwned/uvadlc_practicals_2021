@@ -97,8 +97,10 @@ class LinearModule(object):
         #out = x @ self.initialize['weights'] + self.gradient['bias']
         self.x = x
 
-        print(np.array(x).shape, self.params['weight'].T.shape, self.params['bias'].shape)
-        out = np.array(x) @ self.params['weight'].T + self.params['bias']
+        #print(np.array(x).shape, self.params['weight'].T.shape, self.params['bias'].shape)
+        out = x @ self.params['weight'].T + self.params['bias']
+
+        #print("succesful forward pass")
         #######################
         # END OF YOUR CODE    #
         #######################
@@ -214,7 +216,7 @@ class ReLUModule(object):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-        self.x
+        self.x =None
         #######################
         # END OF YOUR CODE    #
         #######################
@@ -244,9 +246,14 @@ class SoftMaxModule(object):
         # PUT YOUR CODE HERE  #
         #######################
 
-        shift = x.max(axis= 1, keepdims =True)
+        #x = np.array(x)
+        #print("This is the shape of x", x.shape, x)
+        b = np.max(x)
+        #b = np.max(x, axis = 1)
+        #print("This is B", b)
 
-        out = np.exp(x-shift)/np.sum(np.exp(x-shift), axis=1 , keepdims=True)
+        out = np.exp(x - b) / np.sum(np.exp(x - b), axis=1, keepdims= True)
+        #print("Forward pass in softmax works")
 
         self.out= out
 
@@ -320,6 +327,8 @@ class CrossEntropyModule(object):
         # PUT YOUR CODE HERE  #
         #######################
         one_hot = np.zeros_like((x))
+
+        #print("Checking what y is:", y)
         one_hot[np.arange((len(y))), y] = 1
         #print(one_hot)
         out = -np.sum(one_hot*np.log(x))*1/x.shape[0]
